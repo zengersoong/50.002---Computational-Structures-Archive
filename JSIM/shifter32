@@ -1,0 +1,20 @@
+******************Shifter************************
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\nominal.jsim"
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\stdcell.jsim"
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\lab3shifter.jsim"
+
+********************left shift function************************
+.subckt leftshift a[31:0] b[4:0] fill shift[31:0]
+Xmux5 b[4]#32 a[31:0] a[15:0] fill#16 W[31:0] mux2
+Xmux4 b[3]#32 W[31:0] W[23:0] fill#8 X[31:0] mux2
+Xmux3 b[2]#32 X[31:0] X[27:0] fill#4 Y[31:0] mux2
+Xmux2 b[1]#32 Y[31:0] Y[29:0] fill#2 Z[31:0] mux2
+Xmux1 b[0]#32 Z[31:0] Z[30:0] fill shift[31:0] mux2
+.ends
+
+.subckt shift32 ALUFN[1:0] A[31:0] B[4:0] shift[31:0]
+Xshl a[31:0] b[4:0] 0 x[31:0] leftshift
+Xand1 a[31] alufn[1] outand and2
+Xnew A[0:31] B[4:0] outand y[0:31] leftshift
+Xmux alufn[0]#32 x[31:0] y[31:0] shift[31:0] mux2
+.ends

@@ -1,0 +1,28 @@
+.include beta.uasm
+	LDR(StackBase,SP) |Initialise stackpointer
+	CMOVE(4,R1)	|R1 = 4
+
+	PUSH(R1)	|Push r1 as argument before function call
+	BR(square,LP)	| Call square Function 
+	DEALLOCATE(1)	|remove args from stack
+
+	HALT()		|stop program
+
+square:
+	PUSH(LP)	
+	PUSH(BP)
+	MOVE(SP,BP)
+	
+	PUSH(R2)
+	LD(BP,-12,R2)
+	
+	MUL(R2,R2,R0)
+	POP(R2)
+	
+	MOVE(BP,SP)
+	POP(BP)
+	POP(LP)
+	JMP(LP)
+
+StackBase:LONG(.+4)
+	.=.+0x100 |CURRENT+16^2

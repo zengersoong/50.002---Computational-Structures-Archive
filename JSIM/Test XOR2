@@ -1,0 +1,34 @@
+.include "C:\Users\Zenger Soong\Downloads\50002\nominal.jsim"
+
+.include "C:\Users\Zenger Soong\Downloads\50002\8clocks.jsim"
+**************NOR2**********************
+*m(id) (drain) (gate) (source) (bulk)
+.subckt nor2 A B  Z 
+MPU1 P1 A vdd vdd PENH sw=8 sl=1
+MPU2 Z B P1 vdd PENH sw=8 sl=1
+MPU3 0 A Z 0 NENH sw=8 sl=1
+MPD4 0 B Z 0 NENH sw=8 sl=1
+.ends
+
+
+*************XOR*********************
+*m(id) (drain) (gate) (source) (bulk)
+.subckt xor2 a b z 
+Xxor2 a b x nor2
+MPU1 T1 a vdd vdd PENH sw=4 sl=1
+MPU2 z x T1 vdd PENH sw=4 sl=1
+MPD1 z a T3 0  NENH sw=2 sl=1
+MPD2 T3 b 0 0 NENH sw=2 sl=1
+MPU3 T1 b vdd vdd PENH sw=4 sl=1
+MPD3 z x 0 0 NENH sw=2 sl=1
+.ends
+
+
+
+*testOfCircuitxor2
+*(Input) (input2) (output) (nameOfCircuit)
+Xtest clk1 clk2 z xor2 
+.tran 20ns
+.plot clk1
+.plot clk2
+.plot z

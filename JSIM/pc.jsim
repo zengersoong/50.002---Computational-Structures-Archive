@@ -1,0 +1,23 @@
+.include "/50002/jsim/nominal.jsim"
+.include "/50002/jsim/stdcell.jsim"
+.include "/50002jsim/lab6pc.jsim"
+//plus4 circuit is here
+
+
+	
+.subckt pc clk reset ia[31:0]
+	xf01 four[31:3] constant0
+	xf02 four[2] constant1
+	xf03 four[1:0] constant0  
+	
+	xplus4 0 ia[31:0] four[31:0] inplusfour[31:0] z v n adder32
+	xmux reset#32 inplusfour[31:0] 0#32 muxresult[31:0] mux2
+	xreg muxresult[31:0] clk#32 ia[31:0] dreg
+.ends
+
+
+.subckt mux5 s0 s1 s2 d0 d1 d2 d3 d4 out
+xmux4 s0 s1 d0 d1 d2 d3 n1 mux4
+xmux2 mux2 s2 n1 d4 out mux2
+.ends
+

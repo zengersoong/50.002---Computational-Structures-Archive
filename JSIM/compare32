@@ -1,0 +1,11 @@
+******************Comparator************************
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\nominal.jsim"
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\stdcell.jsim"
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\lab3compare.jsim"
+
+.subckt compare32 ALUFN[2:1] z v n cmp[31:0]
+Xxor n v a xor2
+Xoor z a b or2 
+Xmux ALUFN[1] ALUFN[2] 0 z a b cmp[0] mux4
+.connect 0 cmp[31:1]
+.ends

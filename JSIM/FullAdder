@@ -1,0 +1,20 @@
+***************FullAdder( FA) ***********************
+.include "C:\Users\Zenger Soong\Downloads\50002\nominal.jsim"
+.include "C:\Users\Zenger Soong\Downloads\50002\Library.jsim"
+.include "C:\Users\Zenger Soong\Downloads\50002\8clocks.jsim"
+*m(id) (drain) (gate) (source) (bulk)
+.subckt FA a b ci s co
+XSC1 a b x1 xor2 
+XSC2 ci x1 x2 nand2
+XSC3 a b x3 nand2
+XSC4 x1 c1 s xor2
+XSC5 x2 x3 co nand2
+.ends
+*******TestFullAdder******************
+*Xtest clk1 clk2 clk3 s co FA
+.tran 40ns
+.plot clk1
+.plot clk2
+.plot clk3
+.plot s
+.plot co

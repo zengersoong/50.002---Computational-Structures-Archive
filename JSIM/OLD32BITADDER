@@ -1,0 +1,33 @@
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\nominal.jsim"
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\stdcell.jsim"
+.include "C:\Users\Zenger Soong\Documents\50002(JSIM)\lab3adder.jsim"
+
+
+***************32BITADDER************************
+.subckt adder32 ALUFN[0] A[31:0] B[31:0] s[31:0] z v n
+Xfa0 A0 XB0 ALUFN0 s0 c0 FA
+Xfa30 A[31:1] XB[31:1] c[30:0] s[31:1] c[31:1] FA
+Xor B[31:0] ALUFN0#32 XB[31:0] xor2
+Xz1 s[7:0] s[15:8] s[23:16] s[31:24] p[7:0] or4
+Xz2 p[3:0] p[7:4] o[1:0] or4
+Xz3 o0 o1 z nor2
+
+Xns31 s31 ns31 inverter
+Xnxa31 A31 nXA31 inverter
+Xnxb31 XB31 nXB31 inverter
+Xv1 A31 XB31 ns31 v1 and3
+
+Xv2 nXA31 nXB31 s31 v2 and3
+Xv v1 v2 v or2
+.connect s31 n
+.ends
+
+***************FullAdder( FA) ***********************
+
+.subckt FA a b ci s co
+Xxor1 a b 1 xor2
+Xxor2 1 ci s xor2
+Xnand1 ci 1 2 nand2
+Xnand2 b a 3 nand2
+Xnand3 2 3 co nand2
+.ends

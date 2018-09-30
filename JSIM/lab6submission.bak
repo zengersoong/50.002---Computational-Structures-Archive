@@ -1,0 +1,389 @@
+//----------------------------------------------------Lab6 submission----------------------------------------------------//
+.include "nominal.jsim"
+.include "stdcell.jsim"
+.include "lab6checkoff.jsim"
+//----------------------------------ALU32---------------------------------------------------//
+.subckt adder32 ALUFN[0] A[31:0] B[31:0] s[31:0] z v n
+Xfa0 A0 XB0 ALUFN0 s0 c0 FA
+Xfa30 A[31:1] XB[31:1] c[30:0] s[31:1] c[31:1] FA
+Xor B[31:0] ALUFN0#32 XB[31:0] xor2
+Xz1 s[7:0] s[15:8] s[23:16] s[31:24] p[7:0] or4
+Xzf p[3:0] p[7:4] o[1:0] or4
+Xz3 o0 o1 z nor2
+
+Xvf nXA31 nXB31 s31 vf and3
+Xns31 s31 ns31 inverter
+Xnxa31 A31 nXA31 inverter
+Xnxb31 XB31 nXB31 inverter
+Xv1 A31 XB31 ns31 v1 and3
+
+Xv v1 vf v or2
+.connect s31 n
+.ends
+
+***************FullAdder( FA) ***********************
+.subckt FA a b ci s co
+Xxor1 a b 1 xor2
+Xxor2 1 ci s xor2
+Xnand1 ci 1 2 nand2
+Xnand2 b a 3 nand2
+Xnand3 2 3 co nand2
+.ends
+*****************Boolean32********************************
+.subckt boole32 ALUFN[3:0] a[31:0] b[31:0] boole[31:0]
+
+Xbool A[31:0] B[31:0] ALUFN[0]#32 ALUFN[1]#32 ALUFN[2]#32 ALUFN[3]#32 boole[31:0] mux4
+.ends
+
+********************left shift function************************
+.subckt leftshift a[31:0] b[4:0] F shift[31:0]
+Xmux5 b[4]#32 a[31:0] a[15:0] F#16 W[31:0] mux2
+Xmux4 b[3]#32 W[31:0] W[23:0] F#8 X[31:0] mux2
+Xmux3 b[2]#32 X[31:0] X[27:0] F#4 Y[31:0] mux2
+Xmux2 b[1]#32 Y[31:0] Y[29:0] F#2 Z[31:0] mux2
+Xmux1 b[0]#32 Z[31:0] Z[30:0] F shift[31:0] mux2
+.ends
+**************************Shifter*********************************
+.subckt shift32 ALUFN[1:0] A[31:0] B[4:0] shift[31:0]
+Xshl a[31:0] b[4:0] 0 x[31:0] leftShift
+Xand1 a[31] alufn[1] outA and2
+Xnew A[0:31] B[4:0] outA y[0:31] leftShift
+Xmux alufn[0]#32 x[31:0] y[31:0] shift[31:0] mux2
+.ends
+*************************Comparator****************************************
+.subckt compare32 ALUFN[2:1] z v n cmp[31:0]
+Xxor n v a xor2
+Xoor z a b or2 
+Xmux ALUFN[1] ALUFN[2] 0 z a b cmp[0] mux4
+.connect 0 cmp[31:1]
+.ends
+**************************Multiplier**************************************
+****passes first *****
+.subckt add32 a[31:0] b[31:0] ci s[31:0] co 
+Xfirst a[0] b[0] ci s[0] ca_over[0] FA 
+Xmiddle a[30:1] b[30:1] ca_over[29:0] s[30:1] ca_over[30:1] FA
+Xend a[31] b[31] ca_over[30] s[31] co FA
+.ends
+
+.subckt multiply32 a[31:0] b[31:0] multout[31:0]
+Xp0 b[0]#32 a[31:0] rowa[31:0] and2
+Xp1 b[1]#32 a[31:0] rowb[31:0] and2
+Xp2 b[2]#32 a[31:0] rowc[31:0] and2
+Xp3 b[3]#32 a[31:0] rowd[31:0] and2
+Xp4 b[4]#32 a[31:0] rowe[31:0] and2
+Xp5 b[5]#32 a[31:0] rowf[31:0] and2
+Xp6 b[6]#32 a[31:0] rowg[31:0] and2
+Xp7 b[7]#32 a[31:0] rowh[31:0] and2
+Xp8 b[8]#32 a[31:0] rowi[31:0] and2
+Xp9 b[9]#32 a[31:0] rowj[31:0] and2
+Xp10 b[10]#32 a[31:0] rowk[31:0] and2
+Xp11 b[11]#32 a[31:0] rowl[31:0] and2
+Xp12 b[12]#32 a[31:0] rowm[31:0] and2
+Xp13 b[13]#32 a[31:0] rown[31:0] and2
+Xp14 b[14]#32 a[31:0] rowo[31:0] and2
+Xp15 b[15]#32 a[31:0] rowp[31:0] and2
+Xp16 b[16]#32 a[31:0] rowq[31:0] and2
+Xp17 b[17]#32 a[31:0] rowr[31:0] and2
+Xp18 b[18]#32 a[31:0] rows[31:0] and2
+Xp19 b[19]#32 a[31:0] rowt[31:0] and2
+Xp20 b[20]#32 a[31:0] rowu[31:0] and2
+Xp21 b[21]#32 a[31:0] rowv[31:0] and2
+Xp22 b[22]#32 a[31:0] roww[31:0] and2
+Xp23 b[23]#32 a[31:0] rowx[31:0] and2
+Xp24 b[24]#32 a[31:0] rowy[31:0] and2
+Xp25 b[25]#32 a[31:0] rowz[31:0] and2
+Xp26 b[26]#32 a[31:0] rowaa[31:0] and2
+Xp27 b[27]#32 a[31:0] rowbb[31:0] and2
+Xp28 b[28]#32 a[31:0] rowcc[31:0] and2
+Xp29 b[29]#32 a[31:0] rowdd[31:0] and2
+Xp30 b[30]#32 a[31:0] rowee[31:0] and2
+Xp31 b[31]#32 a[31:0] rowff[31:0] and2
+***Hook to zero for first as no carry***
+Xsum0 rowa[31:0] rowb[30:0] 0 0 suma[31:0] t0 add32 // for each row B you remove one as it doesnt go through the circuit anymore
+Xsum1 suma[31:0] rowc[29:0] 0#2 0 sumb[31:0] t1 add32
+Xsum2 sumb[31:0] rowd[28:0] 0#3 0 sumc[31:0] t2 add32
+Xsum3 sumc[31:0] rowe[27:0] 0#4 0 sumd[31:0] t3 add32
+Xsum4 sumd[31:0] rowf[26:0] 0#5 0 sume[31:0] t4 add32
+Xsum5 sume[31:0] rowg[25:0] 0#6 0 sumf[31:0] t5 add32
+Xsum6 sumf[31:0] rowh[24:0] 0#7 0 sumg[31:0] t6 add32
+Xsum7 sumg[31:0] rowi[23:0] 0#8 0 sumh[31:0] t7 add32
+Xsum8 sumh[31:0] rowj[22:0] 0#9 0 sumi[31:0] t8 add32
+Xsum9 sumi[31:0] rowk[21:0] 0#10 0 sumj[31:0] t9 add32
+Xsum10 sumj[31:0] rowl[20:0] 0#11 0 sumk[31:0] t10 add32
+Xsum11 sumk[31:0] rowm[19:0] 0#12 0 suml[31:0] t11 add32
+Xsum12 suml[31:0] rown[18:0] 0#13 0 summ[31:0] t12 add32
+Xsum13 summ[31:0] rowo[17:0] 0#14 0 sumn[31:0] t13 add32
+Xsum14 sumn[31:0] rowp[16:0] 0#15 0 sumo[31:0] t14 add32
+Xsum15 sumo[31:0] rowq[15:0] 0#16 0 sump[31:0] t15 add32
+Xsum16 sump[31:0] rowr[14:0] 0#17 0 sumq[31:0] t16 add32
+Xsum17 sumq[31:0] rows[13:0] 0#18 0 sumr[31:0] t17 add32
+Xsum18 sumr[31:0] rowt[12:0] 0#19 0 sums[31:0] t18 add32
+Xsum19 sums[31:0] rowu[11:0] 0#20 0 sumt[31:0] t19 add32
+Xsum20 sumt[31:0] rowv[10:0] 0#21 0 sumu[31:0] t20 add32
+Xsum21 sumu[31:0] roww[9:0] 0#22 0 sumv[31:0] t21 add32
+Xsum22 sumv[31:0] rowx[8:0] 0#23 0 sumw[31:0] t22 add32
+Xsum23 sumw[31:0] rowy[7:0] 0#24 0 sumx[31:0] t23 add32
+Xsum24 sumx[31:0] rowz[6:0] 0#25 0 sumy[31:0] t24 add32
+Xsum25 sumy[31:0] rowaa[5:0] 0#26 0 sumz[31:0] t25 add32
+Xsum26 sumz[31:0] rowbb[4:0] 0#27 0 sumaa[31:0] t26 add32
+Xsum27 sumaa[31:0] rowcc[3:0] 0#28 0 sumbb[31:0] t27 add32
+Xsum28 sumbb[31:0] rowdd[2:0] 0#29 0 sumcc[31:0] t28 add32
+Xsum29 sumcc[31:0] rowee[1:0] 0#30 0 sumdd[31:0] t29 add32
+Xsum30 sumdd[31:0] rowff[0] 0#31 0 multout[31:0] t30 add32
+
+.ends
+
+
+
+
+*************************checkoff6******************************************
+.subckt alu ALUFN[5:0] A[31:0] B[31:0] alu[31:0] z v n 
+Xadd ALUFN0 A[31:0] B[31:0] add[31:0] z v n adder32
+Xbool ALUFN[3:0] A[31:0] B[31:0] bool[31:0] boole32
+Xshift ALUFN[1:0] A[31:0] B[4:0] shift[31:0] shift32
+Xcmp ALUFN[2:1] z v n cmp[31:0] compare32
+*XmuxC6 ALUFN[4]#32 ALUFN[5]#32 add[31:0] bool[31:0] shift[31:0] cmp[31:0] alu[31:0] mux4
+Xmult A[31:0] B[31:0] multout[31:0] multiply32
+XMultAdd ALUFN1#32 add[31:0] multout[31:0] arith[31:0] mux2 
+Xfinal ALUFN[4]#32 ALUFN[5]#32 arith[31:0] bool[31:0] shift[31:0] cmp[31:0] alu[31:0] mux4
+.ends
+
+//----------------MUX5----------------------------------------------------------//
+.subckt mux5 s0 s1 s2 d0 d1 d2 d3 d4 out
+xmux4 s1 s2  d1 d2 d3 d4 n mux4
+xmux2 s0 n d0 out mux2
+.ends
+
+ // -------------------------------------------PC ------------------------------------------//
+	
+.subckt pc clk reset pcsel[2:0] xadr[31:0] illop[31:0] jt[31:0] pc4c_i[31:0] PCF_i[31:0] ia[31:0] c[31:0]
+
+//----------------------------jmpPC-------------------------------------------//
+XjmpPC ia[31] jt[31] nPC and2
+
+.connect temp[2] vdd
+.connect temp[31:3] 0
+.connect temp[1:0] 0
+XPCF 0 ia[31:0] temp[31:0] PCF_i[31:0] z4 v4 n4 adder32
+
+// --------------------------------------------Pc+4+SET	shift by 2 ,mul by 4 ----------------------------------------------------------//
+Xpc4c 0 PCF[31:0] c[29:0] 0#2 pc4c_i[31:0] z1 v1 n1 adder32
+
+// ---------------------------supervisor bit 31-------------------------------//
+Xpc ia[31] PCF[31] buffer // direct connect
+Xpc31 ia[31] pc4c[31] buffer // direct connect
+
+
+//------------------------------Low order 2 bit---------------------------------//
+XLow1_1 PCF_i[30:2] constA[30:2] buffer
+XLow1 constA[30:0] PCF[30:0] buffer
+
+XLow1_2 0#2 constA[1:0] buffer
+
+XLow2_1 pc4c_i[30:2] constB[30:2] buffer
+XLow2_2 0#2 constB[1:0] buffer
+XLow2 constB[30:0] pc4c[30:0] buffer
+
+
+
+// THIS CANT WORK! Xmuxpc pcsel[0]#32 pcsel[1]#32 pcsel[2]#32 PCF[31:0] Pc4c[31:0] nPC jt[30:2] 0#2 illop[31:0] xadr[31:0] resultmux[31:0] mux5
+//-------------------------------//MUX INPUT-------------------------------------------------------------------//
+XmuxPC1 pcsel[0]#32 pcsel[1]#32 PCF[31:0] pc4c[31:0] nPC jt[30:2] 0#2 illop[31:0] result[31:0] mux4
+XmuxPC2 pcsel[2]#32 result[31:0] xadr[31:0] resultmux[31:0] mux2
+
+//----------------------------------RESET----------------------------------//
+Xmux32 reset#32 resultmux[31:0] vdd 0#31 d[31:0] mux2 //reset to 80000000
+Xreg32 d[31:0] clk#32 ia[31:0] dreg
+.ends
+
+//--------------------------------------------------------REGFILE----------------------------------------------------------------------------------//
+.subckt regfile clk werf wasel ra2sel ra[4:0] rb[4:0] rc[4:0]
++ wdata[31:0] radata[31:0] rbdata[31:0]
+Xregfile
++ vdd 0 0 ra[4:0] adata[31:0] 
++ vdd 0 0 ra2mux[4:0] bdata[31:0] 
++ 0 clk werf wa[4:0] wdata[31:0] 
++ $memory width=32 nlocations=31
+Xra2mux ra2sel#5 rb[4:0] rc[4:0] ra2mux[4:0] mux2
+
+//----------------------------------------------------------WASEL--------------------------------------------------------------------------------//
+.connect xp[4:1] vdd
+.connect xp[0] 0
+Xwasel wasel#5 rc[4:0] xp[4:0] wa[4:0] mux2
+
+//---------------------------------------------------------RADATA-----------------------------------------------------------------------------//
+X4OrLog ra[4] ra[3] ra[2] ra[1] z1r and4
+X2OrLog z1r ra[0] ResOne and2
+X0oradata ResOne#32 adata[31:0] 0#32 radata[31:0] mux2
+
+//---------------------------------------------------------RBDATA-----------------------------------------------------------------------------//
+X4OrLogb ra2mux4 ra2mux3 ra2mux2 ra2mux1 zfr and4
+X2OrLogb ra2mux0 zfr ResTwo and2
+X0orbdata ResTwo#32 bdata[31:0] 0#32 rbdata[31:0] mux2
+.ends
+
+
+//-------------------------------------------------------CTL---------------------------------------------------------------------------------//
+.subckt ctl reset z id[31:26] ra2sel bsel alufn[5:0] wdsel[1:0] werf moe wr newpcsel[2:0] wasel asel
+Xctl vdd 0 0 id[31:26] // one r port
++ pcsel[2:0] wasel asel ra2sel bsel alufn[5:0] wdsel[1:0] werf moe xwr
++ $memory width=18 nlocations=64 contents=(
+//------------------------------------------------------opcodes----------------------------------------------------------------------------//
+//------------------------------------------crazy typing here, eyes pops out---------------------------------------------------------------//
++ 0b011100000000000100		// opcode=0b000000
++ 0b011100000000000100		// opcode=0b000001
++ 0b011100000000000100		// opcode=0b000010
++ 0b011100000000000100		// opcode=0b000011
++ 0b011100000000000100		// opcode=0b000100
++ 0b011100000000000100		// opcode=0b000101
++ 0b011100000000000100		// opcode=0b000110
++ 0b011100000000000100		// opcode=0b000111
++ 0b011100000000000100		// opcode=0b001000
++ 0b011100000000000100		// opcode=0b001001
++ 0b011100000000000100		// opcode=0b001010
++ 0b011100000000000100		// opcode=0b001011
++ 0b011100000000000100		// opcode=0b001100
++ 0b011100000000000100		// opcode=0b001101
++ 0b011100000000000100		// opcode=0b001110
++ 0b011100000000000100		// opcode=0b001111
++ 0b011100000000000100		// opcode=0b010000
++ 0b011100000000000100		// opcode=0b010001
++ 0b011100000000000100		// opcode=0b010010
++ 0b011100000000000100		// opcode=0b010011
++ 0b011100000000000100		// opcode=0b010100
++ 0b011100000000000100		// opcode=0b010101
++ 0b100100000000000100		// opcode=0b010110 IRQ
++ 0b011100000000000100		// opcode=0b010111
++ 0b000000100000010110      	// opcode=0b011000 LD
++ 0b000001100000000001     	// opcode=0b011001 ST
++ 0b011100000000000100		// opcode=0b011010
++ 0b010000000000000100		// opcode=0b011011 JMP
++ 0b011100000000000100		// opcode=0b011100
++ 0b000000000000000100		// opcode=0b011101 BEP
++ 0b000000000000000100		// opcode=0b011110 BNE
++ 0b000010001101010110		// opcode=0b011111 LDR
++ 0b000000000000001100  	// opcode=0b100000 ADD
++ 0b000000000000101100     	// opcode=0b100001 SUB
++ 0b011100000000000100		// opcode=0b100010
++ 0b011100000000000100		// opcode=0b100011
++ 0b000000011001101100    	// opcode=0b100100 CMPEQ
++ 0b000000011010101100    	// opcode=0b100101 CMPLT
++ 0b000000011011101100  	// opcode=0b100110 CMPLE
++ 0b011100000000000100		// opcode=0b100111
++ 0b000000001100001100      	// opcode=0b101000 AND
++ 0b000000001111001100     	// opcode=0b101001 OR
++ 0b000000001011001100      	// opcode=0b101010 XOR
++ 0b011100000000000100		// opcode=0b101011
++ 0b000000010000001100      	// opcode=0b101100 SHL
++ 0b000000010000101100     	// opcode=0b101101 SHR
++ 0b000000010001101100    	// opcode=0b101110 SRA
++ 0b011100000000000100		// opcode=0b101111
++ 0b000000100000001100    	// opcode=0b110000 ADDC
++ 0b000000100000101100    	// opcode=0b110001 SUBC
++ 0b011100000000000100		// opcode=0b110010
++ 0b011100000000000100		// opcode=0b110011
++ 0b000000111001101100     	// opcode=0b110100 CMPEQC
++ 0b000000111010101100     	// opcode=0b110101 CMPLTC
++ 0b000000111011101100     	// opcode=0b110110 CMPLEC
++ 0b011100000000000100		// opcode=0b110111
++ 0b000000101100001100      	// opcode=0b111000 ANDC
++ 0b000000101111001100     	// opcode=0b111001 ORC
++ 0b000000101011001100     	// opcode=0b111010 XORC
++ 0b011100000000000100		// opcode=0b111011
++ 0b000000110000001100     	// opcode=0b111100 SHLC
++ 0b000000110000101100     	// opcode=0b111101 SHRC
++ 0b000000110001101100    	// opcode=0b111110 SRAC
++ 0b011100000000000100		// opcode=0b111111
++)
+
+// branch equal and bne-------------------------//
+Xnand2 id31 id27 re nor2 
+Xand4 id30 id29 id28 id26 rd and4 
+Xand2 re rd beqtrue and2 
+Xand6 id30 id29 id28 id27 bt and4
+Xnand3 id31 id26 bo nor2  
+Xnotz z zinv inverter 
+Xand zinv beqtrue beq and2
+Xand5 bo bt bnetrue and2 
+Xand1 z bnetrue bne and2 
+Xchoice id26 bne beq Bout mux2
+Xpcsel Bout#3 pcsel[2:0] 0 0 vdd newpcsel[2:0] mux2  
+// reset WR
+Xmux reset xwr 0 wr mux2
+.ends
+
+
+	
+//-------------------------------------------------------------------------Beta-------------------------------------------------------------//
+.subckt beta clk reset irq ia[31:0] id[31:0] ma[31:0] // ma ==output, ia==output, id ==input, 
+
++ moe mrd[31:0] wr mwd[31:0] // moe output/mrd input/wr output/mwd output
+
+// out: ia, ma, moe , wr, mwd
+
+// illop address == 0x80000008 illop == 0x80000004
+.connect xadr[3] vdd
+.connect xadr[31] vdd
+.connect xadr[30:4] 0
+.connect xadr[2:0] 0
+.connect illop[1:0] 0
+.connect illop[2] vdd
+.connect illop[30:3] 0
+.connect illop[31] vdd
+
+
+
+//-----------------------------------------------regFile------------------------------------------------------------//
+Xregfile clk werf wasel ra2sel id[20:16] id[15:11] id[25:21] // ---RA RB RC----//
++ wdata[31:0] radata[31:0] rbdata[31:0] regfile 
+//-----------------------------------------------pc------------------------------------------------------------//
+Xpc clk reset newpcsel[2:0] xadr[31:0] illop[31:0] radata[31:0] pc4c[31:0] PCF[31:0] ia[31:0] const[31:0] pc // -->ia
+
+//-----------------------------------------------CTL-------------------------------------------------------------//
+Xctl reset z id[31:26] ra2sel bsel alufn[5:0] wdsel_i[1:0] werf_i moe wr_i pcsel[2:0] wasel_i asel ctl // the id[31:26]==opcode>>>>>>>>>>>>>>>>moe wr
+
+Xum ia[31] pcu  inverter // when irq =1 && pc31 is 0
+X1 irq pcu um and2
+// =-------------------User mode, wasel to 1, werf to 1, wdsel to 0, wr to 0, interrupt will result in pcsel to 4,  -----//
+X2 um wasel_i vdd wasel mux2 //um: 1-> wasel to 1
+X3 um werf_i vdd werf mux2
+X4 um#2 wdsel_i[1:0] 0#2 wdsel[1:0] mux2
+X5 um wr_i 0 wr mux2
+
+//-----------------------------------------BSEL mux--------------------------------------------------------------//
+Xbuffer id[15:0] const[15:0] buffer
+Xbuffer1 id[15]#16 const[31:16] buffer
+
+//---------------------------------------mwd / rbdata------------------------------------------------------------//
+Xbuffer2 rbdata[31:0] mwd[31:0] buffer
+XBselmux   bsel#32 rbdata[31:0] const[31:0] bdata[31:0] mux2 // SXT C or bdata
+
+//------------------------------------ASEL mux------------------------------------------------
+XAselmux asel#32 radata[31:0] 0 pc4c[30:0] adata[31:0] mux2
+
+//WDSEL mux // JMP PC EQUIVALENT
+XWDselmux wdsel[0]#32 wdsel[1]#32 ia[31] PCF[30:0] ma[31:0] mrd[31:0] 0#32 wdata[31:0] mux4
+
+//---------------------------------------PCSEL MUX--------------------------------------------------------------//
+
+XpcSelMux um#3 pcsel[2:0] vdd 0 0 newpcsel[2:0] mux2 //  adr
+
+// -------------------------------------------------Z------------------------------------------------------//
+Xand1 radata[3:0] ans1 nor4
+Xand2 radata[7:4] ans2 nor4
+Xand3 radata[11:8] ans3 nor4
+Xand4 radata[15:12] ans4 nor4
+Xand5 radata[19:16] ans5 nor4
+Xand6 radata[23:20] ans6 nor4
+Xand7 radata[27:24] ans7 nor4
+Xand8 radata[31:28] ans8 nor4
+Xandfinal1y ans1 ans2 ans3 ans4 finish1 and4
+Xandfinally2 ans5 ans6 ans7 ans8 finish2 and4
+Xandfinal finish1 finish2 z nand2
+
+//----------------------------------outputfinally---------------------------------------------//
+//Checkoff6
+Xalu alufn[5:0] adata[31:0] bdata[31:0] ma[31:0] zf vf nf alu
+.ends
+
+

@@ -1,0 +1,128 @@
+
+
+
+
+
+.subckt mux5 s0 s1 s2 d0 d1 d2 d3 d4 out
+xmux4 s0 s1 d0 d1 d2 d3 n1 mux4
+xmux2 mux2 s2 n1 d4 out mux2
+.ends
+
+
+//---------------------------------------pc---------------------------------------------//
+.subckt pc clk reset pcsel[2:0] xadr[31:0] illop[31:0] jt[31:0] c[31:0] ia[31:0] cplus[31:0] iaplusfour[31:0]
+
+    Xand ia[31] jt[31] newpc31 and2
+
+
+    Xadd1 ia[31:0] 0#29 vdd 0#3 iaplusfour[31:0] ADDER32 
+    
+    Xadd2 iaplusfour[31:0] c[29:0] 0#3 cplus[31:0] ADDER32
+    
+    Xmux1 pcsel[0]#32 pcsel[1]#32 iaplusfour[31:0] ia[31] cplus[30:0] newpc31 jt[30:2] 0#2 illop[31:0] intermedout[31:0] mux4
+    Xmux2 pcsel[2]#32 intermedout[31:0] xadr[31:0] muxout[31:0] mux2
+    
+    Xreset reset#32 muxout[31:0] vdd 0#31 nextmux[31:0] mux2
+    Xdreg nextmux[31:0] clk#32 ia[31:0] dreg
+.ends
+
+
+//--------------------------------------------regfile-------------------------------------//
+
+.subckt regfile clkwerf ra2sel ra[4:0] rb[4:0] rc[4:0]
++ wdata[31:0] radata[31:0] rbdata[31:0]
+
+
+Xregfile
++ vdd 0 0 ra[4:0] adata[31:0]     //  read A port
++ vdd 0 0 ra2mux[4:0] bdata[31:0] //  read B port
++ 0 clk werf rc[4:0] wdata[31:0]  // write to port
++ $memory width=32 nlocations=31
+
+
+xselect ra2sel#5 rb[4:0] rc[4:0] ra2mux[4:0] mux2
+xm ra[3:0] z1 and4
+xm2 ra[4] z1 z2 and2
+
+xm3 ra2mux[3:0] z3 and4
+xm4 ra2mux[4] z3 z4 and2
+
+xmux z2#32 adata[31:0] 0#32 radata[31:0] mux2 // this is to wire to a bunch of zeros using mux for a
+xmux2 z4#32 bdata[31:0] 0#32 rbdata[31:0] mux2 // this is to wire to a bunch of zeros using mux for a
+
+.ends
+
+
+//-----------------------------------CTL----------------------------------------------//
+.subckt ctl resert id[31:26] ra2sel bsel alufn[5:0] wdsel[1:0] werf moe wr
+
+Xctl vdd 0 0 id[31:26] // one read port
++pcsel[2:0] wase1 asel ra2sel bsel alufn[5:0] wdsel[1:0] werf moe xwr
++$memory width=18 nlocations=64 contents=(
++ 0b011100000000000100  // opcode=0b000000
++ 0b011100000000000100  // opcode=0b000001
++ 0b011100000000000100  // opcode=0b000010
++ 0b011100000000000100  // opcode=0b000011
++ 0b011100000000000100  // opcode=0b000100
++ 0b011100000000000100  // opcode=0b000101
++ 0b011100000000000100  // opcode=0b000110
++ 0b011100000000000100  // opcode=0b000111
++ 0b011100000000000100  // opcode=0b001000
++ 0b011100000000000100  // opcode=0b001001
++ 0b011100000000000100  // opcode=0b001010
++ 0b011100000000000100  // opcode=0b001011
++ 0b011100000000000100  // opcode=0b001100
++ 0b011100000000000100  // opcode=0b001101
++ 0b011100000000000100  // opcode=0b001110
++ 0b011100000000000100  // opcode=0b001111
++ 0b011100000000000100  // opcode=0b010000
++ 0b011100000000000100  // opcode=0b010001
++ 0b011100000000000100  // opcode=0b010010
++ 0b011100000000000100  // opcode=0b010011
++ 0b011100000000000100  // opcode=0b010100
++ 0b011100000000000100  // opcode=0b010101
++ 0b100100000000000100  // opcode=0b010110 irq
++ 0b011100000000000100  // opcode=0b010111
++ 0b000000100000010110  // opcode=0b011000 ld
++ 0b000001100000000001  // opcode=0b011001 st
++ 0b011100000000000100  // opcode=0b011010
++ 0b010000000000000100  // opcode=0b011011 jmp
++ 0b011100000000000100  // opcode=0b011100
++ 0b001000000000000100  // opcode=0b011101 beq
++ 0b001000000000000100  // opcode=0b011110 bne
++ 0b000010001101010110  // opcode=0b011111 ldr
++ 0b000000000000001100  // opcode=0b100000 add
++ 0b000000000000101100  // opcode=0b100001 sub
++ 0b011100000000000100  // opcode=0b100010
++ 0b011100000000000100  // opcode=0b100011
++ 0b000000011001101100  // opcode=0b100100 cmpeq
++ 0b000000011010101100  // opcode=0b100101 cmplt
++ 0b000000011011101100  // opcode=0b100110 cmple
++ 0b011100000000000100  // opcode=0b100111
++ 0b000000001100001100  // opcode=0b101000 and
++ 0b000000001111001100  // opcode=0b101001 or
++ 0b000000001011001100  // opcode=0b101010 xor
++ 0b011100000000000100  // opcode=0b101011
++ 0b000000010000001100  // opcode=0b101100 shl
++ 0b000000010000101100  // opcode=0b101101 shr
++ 0b000000010001101100  // opcode=0b101110 sra
++ 0b011100000000000100  // opcode=0b101111
++ 0b000000100000001100  // opcode=0b110000 addc
++ 0b000000100000101100  // opcode=0b110001 subc
++ 0b011100000000000100  // opcode=0b110010
++ 0b011100000000000100  // opcode=0b110011
++ 0b000000111001101100  // opcode=0b110100 cmpeqc
++ 0b000000111010101100  // opcode=0b110101 cmpltc
++ 0b000000111011101100  // opcode=0b110110 cmplec
++ 0b011100000000000100  // opcode=0b110111
++ 0b000000101100001100  // opcode=0b111000 andc
++ 0b000000101111001100  // opcode=0b111001 orc
++ 0b000000101011001100  // opcode=0b111010 xorc
++ 0b011100000000000100  // opcode=0b111011
++ 0b000000110000001100  // opcode=0b111100 shlc
++ 0b000000110000101100  // opcode=0b111101 shrc
++ 0b000000110001101100  // opcode=0b111110 srac
++ 0b011100000000000100  // opcode=0b111111
++)
+
+
