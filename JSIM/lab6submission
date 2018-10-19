@@ -348,9 +348,10 @@ X1 irq pcu um and2
 // =-------------------User mode, wasel to 1, werf to 1, wdsel to 0, wr to 0, interrupt will result in pcsel to 4,  -----//
 X2 um wasel_i vdd wasel mux2 //um: 1-> wasel to 1
 X3 um werf_i vdd werf mux2
-X4 um#2 wdsel_i[1:0] 0#2 wdsel[1:0] mux2
+X4 um#2 wdsel_i[1:0] 0#2 wdsel[1:0] mux2 
 X5 um wr_i 0 wr mux2
-
+//OKA, KNOWS YOU COPYING THIS REPO 2018 SOPHOMORES... YOU HAVE BEEN WARNED.
+// HE WLL CHECK NETLIST
 //-----------------------------------------BSEL mux--------------------------------------------------------------//
 Xbuffer id[15:0] const[15:0] buffer
 Xbuffer1 id[15]#16 const[31:16] buffer
