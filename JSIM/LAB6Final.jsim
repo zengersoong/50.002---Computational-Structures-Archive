@@ -169,7 +169,7 @@ Xmux reset xwr 0 wr mux2
 
 
 
-
+//--- IS THIS ETHICAL? COPYING CODE... OKA IS BE WATCHIN'---//
 //---------------------------------------------------beta----------------------------------------//
 .subckt beta clk reset irq ia[31:0] id[31:0] ma[31:0] moe mrd[31:0] wr mwd[31:0]
 //output
